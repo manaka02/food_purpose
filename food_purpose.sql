@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 7.3                               */
-/* Created on:     02/03/2017 10:39:28                          */
+/* Created on:     02/03/2017 14:49:44                          */
 /*==============================================================*/
 
 
@@ -9,14 +9,6 @@ drop index CATEGORIE_ALIMENT_FK;
 drop index ALIMENT_PK;
 
 drop table ALIMENT;
-
-drop index ALIMENT_COMPOSANT2_FK;
-
-drop index ALIMENT_COMPOSANT_FK;
-
-drop index ALIMENT_COMPOSANT_PK;
-
-drop table ALIMENT_COMPOSANT;
 
 drop index TYPE_PK;
 
@@ -34,18 +26,6 @@ drop index RECHERCHE_PK;
 
 drop table RECHERCHE;
 
-drop index SPECIAL_PK;
-
-drop table SPECIAL;
-
-drop index SPECIAL_ALIMENT2_FK;
-
-drop index SPECIAL_ALIMENT_FK;
-
-drop index SPECIAL_ALIMENT_PK;
-
-drop table SPECIAL_ALIMENT;
-
 drop index UTILISATEUR_PK;
 
 drop table UTILISATEUR;
@@ -58,6 +38,8 @@ ALIMENT_ID           SERIAL               not null,
 CATEGORIE_ID         INT4                 not null,
 DESIGNATION          VARCHAR(50)          null,
 DETAILS              VARCHAR(100)         null,
+BIO                  BOOL                 null,
+CHOLESTEROL          BOOL                 null,
 constraint PK_ALIMENT primary key (ALIMENT_ID)
 );
 
@@ -73,37 +55,6 @@ ALIMENT_ID
 /*==============================================================*/
 create  index CATEGORIE_ALIMENT_FK on ALIMENT (
 CATEGORIE_ID
-);
-
-/*==============================================================*/
-/* Table: ALIMENT_COMPOSANT                                     */
-/*==============================================================*/
-create table ALIMENT_COMPOSANT (
-ALIMENT_ID           INT4                 not null,
-COMPOSANT_ID         INT4                 not null,
-constraint PK_ALIMENT_COMPOSANT primary key (ALIMENT_ID, COMPOSANT_ID)
-);
-
-/*==============================================================*/
-/* Index: ALIMENT_COMPOSANT_PK                                  */
-/*==============================================================*/
-create unique index ALIMENT_COMPOSANT_PK on ALIMENT_COMPOSANT (
-ALIMENT_ID,
-COMPOSANT_ID
-);
-
-/*==============================================================*/
-/* Index: ALIMENT_COMPOSANT_FK                                  */
-/*==============================================================*/
-create  index ALIMENT_COMPOSANT_FK on ALIMENT_COMPOSANT (
-ALIMENT_ID
-);
-
-/*==============================================================*/
-/* Index: ALIMENT_COMPOSANT2_FK                                 */
-/*==============================================================*/
-create  index ALIMENT_COMPOSANT2_FK on ALIMENT_COMPOSANT (
-COMPOSANT_ID
 );
 
 /*==============================================================*/
@@ -128,6 +79,7 @@ CATEGORIE_ID
 /*==============================================================*/
 create table COMPOSANT (
 COMPOSANT_ID         SERIAL               not null,
+ALIMENT_ID           INT4                 not null,
 KCAL                 INT2                 null,
 GLUCIDE              INT2                 null,
 PROTIDE              INT2                 null,
@@ -179,54 +131,6 @@ USER_ID
 );
 
 /*==============================================================*/
-/* Table: SPECIAL                                               */
-/*==============================================================*/
-create table SPECIAL (
-SPECIAL_ID           SERIAL               not null,
-BIO                  BOOL                 null,
-CHOLESTEROL          BOOL                 null,
-constraint PK_SPECIAL primary key (SPECIAL_ID)
-);
-
-/*==============================================================*/
-/* Index: SPECIAL_PK                                            */
-/*==============================================================*/
-create unique index SPECIAL_PK on SPECIAL (
-SPECIAL_ID
-);
-
-/*==============================================================*/
-/* Table: SPECIAL_ALIMENT                                       */
-/*==============================================================*/
-create table SPECIAL_ALIMENT (
-ALIMENT_ID           INT4                 not null,
-SPECIAL_ID           INT4                 not null,
-constraint PK_SPECIAL_ALIMENT primary key (ALIMENT_ID, SPECIAL_ID)
-);
-
-/*==============================================================*/
-/* Index: SPECIAL_ALIMENT_PK                                    */
-/*==============================================================*/
-create unique index SPECIAL_ALIMENT_PK on SPECIAL_ALIMENT (
-ALIMENT_ID,
-SPECIAL_ID
-);
-
-/*==============================================================*/
-/* Index: SPECIAL_ALIMENT_FK                                    */
-/*==============================================================*/
-create  index SPECIAL_ALIMENT_FK on SPECIAL_ALIMENT (
-ALIMENT_ID
-);
-
-/*==============================================================*/
-/* Index: SPECIAL_ALIMENT2_FK                                   */
-/*==============================================================*/
-create  index SPECIAL_ALIMENT2_FK on SPECIAL_ALIMENT (
-SPECIAL_ID
-);
-
-/*==============================================================*/
 /* Table: UTILISATEUR                                           */
 /*==============================================================*/
 create table UTILISATEUR (
@@ -251,14 +155,9 @@ alter table ALIMENT
       references CATEGORIE (CATEGORIE_ID)
       on delete restrict on update restrict;
 
-alter table ALIMENT_COMPOSANT
-   add constraint FK_ALIMENT__ALIMENT_C_ALIMENT foreign key (ALIMENT_ID)
+alter table COMPOSANT
+   add constraint FK_COMPOSAN_ALIMENT_C_ALIMENT foreign key (ALIMENT_ID)
       references ALIMENT (ALIMENT_ID)
-      on delete restrict on update restrict;
-
-alter table ALIMENT_COMPOSANT
-   add constraint FK_ALIMENT__ALIMENT_C_COMPOSAN foreign key (COMPOSANT_ID)
-      references COMPOSANT (COMPOSANT_ID)
       on delete restrict on update restrict;
 
 alter table RECHERCHE
@@ -269,15 +168,5 @@ alter table RECHERCHE
 alter table RECHERCHE
    add constraint FK_RECHERCH_UTILISATE_UTILISAT foreign key (USER_ID)
       references UTILISATEUR (USER_ID)
-      on delete restrict on update restrict;
-
-alter table SPECIAL_ALIMENT
-   add constraint FK_SPECIAL__SPECIAL_A_ALIMENT foreign key (ALIMENT_ID)
-      references ALIMENT (ALIMENT_ID)
-      on delete restrict on update restrict;
-
-alter table SPECIAL_ALIMENT
-   add constraint FK_SPECIAL__SPECIAL_A_SPECIAL foreign key (SPECIAL_ID)
-      references SPECIAL (SPECIAL_ID)
       on delete restrict on update restrict;
 
